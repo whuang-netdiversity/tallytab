@@ -1,0 +1,44 @@
+/* Keep display tight (no change from your last) */
+#tt-calc-sheet .ttc-display {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
+/* Ensure inner can scroll; add bottom padding so there's a gap below keypad */
+#tt-calc-sheet .sheet-modal-inner {
+  padding-top: 0;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom)); /* NEW: bottom-only gap */
+  max-height: calc(70vh - var(--f7-toolbar-height, 44px));
+  overflow-y: auto;
+}
+
+/* Tighten Framework7 block spacing (unchanged) */
+#tt-calc-sheet .block {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 8px;
+  padding-bottom: 0;
+}
+
+/* Keypad buttons (unchanged) */
+#tt-calc-sheet .grid .button {
+  height: 44px;
+  border-radius: 12px;
+}
+
+/* Cap sheet height (unchanged) */
+#tt-calc-sheet {
+  height: auto;
+  max-height: 70vh;
+}
+
+/* Pad keypad L/R; TOP = 0 so gap is only at bottom */
+#tt-calc-sheet .ttc-grid {
+  padding: 0 12px; /* no top gap, 12px sides */
+  padding-bottom: calc(12px + env(safe-area-inset-bottom)); /* bottom-only gap */
+}
