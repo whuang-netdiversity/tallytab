@@ -37,7 +37,11 @@ export function updateRepeater(page, contents = [], feature_allowed = false, pos
     logger.warn(`${page.repeater} updated items: `, contents.length);
 };
 
-
+/**
+ * Function to update item content
+ * @param {*} index 
+ * @returns 
+ */
 export function updateItem(index) {
     const patrons = getStorage(PATRONS_KEY) || [];
     const patron = patrons && Number.isInteger(index) ? patrons[index] : null;
@@ -111,6 +115,10 @@ export function updateBill(prop) {
     $(prop.total).text(`$${totalWithTip.toFixed(2)}`);
 }
 
+/**
+ * Function to update the tally total
+ * @param {*} prop 
+ */
 export function updateTally(prop) {
     // Pull current tally { baseTotal, tallyTotal, tipPct }
     const { baseTotal = 0, tallyTotal = 0, tipPct = 0 } = getTally();
