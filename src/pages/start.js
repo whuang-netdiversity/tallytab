@@ -18,7 +18,7 @@ import { getStorage } from '@/app/utils';
 import { logger } from '@/app/log';
 import { removePatron } from '@/app/person';
 import { mountCalcSheet, openCalc } from '@/services/calc-sheet';
-import { BILL_KEY, BILL_EVENT_KEY, TALLY_EVENT_KEY, PATRONS_KEY } from '@/app/constants';
+import { BILL_EVENT_KEY, TALLY_EVENT_KEY, PATRONS_KEY } from '@/app/constants';
 import { unsetTally } from '@/app/tally';
 
 export const start = {
@@ -88,10 +88,8 @@ $(document).on('click', start.bill.section, (e) => {
         decimals: 2,
         /**
          * Apply in-line tip cleanup
-         * @param {*} val 
-         * @param {*} el 
          */
-        onApply(val, el) {
+        onApply() {
             billBase = currencyToNumber($(start.bill.total).text());
 
             if (tipActive != null) {
@@ -156,9 +154,8 @@ $(document).on('click', start.tip.other, (e) => {
         /**
          * Apply in-line tip cleanup
          * @param {*} val 
-         * @param {*} el 
          */
-        onApply(val, el) {
+        onApply(val) {
             const pct = percentToNumber(val);
 
             if (pct === 0) {

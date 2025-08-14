@@ -43,8 +43,7 @@ $(document).on('page:init', '.page[data-name="patron_detail"]', ({ detail: page 
     logger.info('patron detail page reloaded:', JSON.stringify(query));
 });
 
-app.on(`lineChange[#${patron_detail.add.repeater}]`, (event, repeater, rowindex, item) => {
-    const { dataindex: index } = item;
+app.on(`lineChange[#${patron_detail.add.repeater}]`, () => {
     if (guest === null) return;
 
     const patrons = getStorage(PATRONS_KEY) || [];
@@ -106,6 +105,11 @@ app.on(`lineChange[#${patron_detail.add.repeater}]`, (event, repeater, rowindex,
             {
                 text: 'Add',
                 bold: true,
+                /**
+                 * Handler for click
+                 * @param {*} d 
+                 * @returns 
+                 */
                 onClick(d) {
                     const $el = $(d.$el);
                     const label = String($el.find('input[name="label"]').val() || '').trim();
@@ -147,6 +151,10 @@ app.on(`lineChange[#${patron_detail.add.repeater}]`, (event, repeater, rowindex,
             }
         ],
         on: {
+            /**
+             * Handler for open
+             * @param {*} d 
+             */
             opened(d) {
                 $(d.$el).find('input[name="label"]').focus();
             }
