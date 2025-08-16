@@ -49,7 +49,7 @@ async function appStart() {
     const isPremium = appConfig.simulate_premium ?? false;
     const featureConfig = appConfig.premium_features;
 
-    simulatePremium(premConfig);
+    simulatePremium(isPremium);
     setFeatureMap(featureConfig);
 
     await showInterstitialAd(appConfig);
