@@ -14,7 +14,7 @@ export async function showInterstitialAd(config) {
 
     const feature_allowed = gateFeature('remove_ads');
 
-    if (feature_allowed) {
+    if (!feature_allowed) {
         logger.info('[AdMob] Ads removed for premium user');
         return;
     }
