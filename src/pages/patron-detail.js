@@ -2,10 +2,10 @@
 import { logger } from '@/app/log';
 import { getStorage } from '@/app/utils';
 import { prevPath, nextPath } from '@/app/utils';
-import { addItemToPatron, removeItemFromPatron } from '@/app/person';
+import { updatePatronPaidStatus, addItemToPatron, removeItemFromPatron } from '@/app/person';
 import { setTally } from '@/app/tally';
 import { start } from '@/pages/start';
-import { PATRONS_KEY } from '@/app/constants';
+import { TALLY_EVENT_KEY, PATRONS_KEY, RECEIPT_EVENT_KEY } from '@/app/constants';
 
 export const patron_detail = {
     key: 'detail-3982',
@@ -22,8 +22,29 @@ export const patron_detail = {
         repeater: 'repeater-1266',
         repeater_container: '#div-1265'
     },
+    receipt: {
+        title: '#div-1324',
+        subtotal: '#h2-1307',
+        tip_msg: '#h2-1311',
+        tip: '#h2-1313',
+        total: '#h2-1321'
+    },
+    checkbox: {
+        paid_container: '#div-1349',
+        paid_component: '<div class="display-flex align-items-center margin-top">\
+            <label class="checkbox display-flex align-items-center">\
+                <input type="checkbox" id="mark-as-paid">\
+                <i class="icon-checkbox"></i>\
+                <span class="margin-left-half">Mark this tab as paid</span>\
+            </label>\
+        </div>'
+    },
+    paid: {
+        container: '#div-1347',
+        stamp: '.receipt-paid-stamp',
+        component: '<div class="receipt-paid-stamp">PAID</div>'
+    },
     bread_crumb: 1
-
 };
 
 let guest = null;
@@ -38,6 +59,16 @@ $(document).on('page:init', '.page[data-name="patron_detail"]', ({ detail: page 
     guest = patrons[personIndex];
 
     $(patron_detail.title).text(`${guest.label}'s tab`);
+    $(patron_detail.checkbox.paid_container).html(patron_detail.checkbox.paid_component);
+    $(patron_detail.paid.container).addClass('receipt-wrapper position-relative');
+
+    if (guest.paid) {
+        $('#mark-as-paid').prop('checked', guest.paid === true);        
+        $(patron_detail.paid.container).append(patron_detail.paid.component);
+    }
+    else {
+        $(patron_detail.paid.stamp).remove();
+    }
 
     $(patron_detail.back_button).removeClass('back');
     logger.info('patron detail page reloaded:', JSON.stringify(query));
@@ -48,6 +79,9 @@ app.on(`lineChange[#${patron_detail.add.repeater}]`, () => {
 
     const patrons = getStorage(PATRONS_KEY) || [];
     const patronIndex = patrons.findIndex(p => p?.label === guest?.label);
+    guest = patrons[personIndex];
+
+    if (guest.paid) return;
 
     if (patronIndex < 0) {
         console.warn('[TallyTab] patron not found in storage');
@@ -145,8 +179,10 @@ app.on(`lineChange[#${patron_detail.add.repeater}]`, () => {
                     setTally();
 
                     // Kick your existing UI refresh (already abstracted elsewhere)
+                    app.emit('interfacePage', { key: TALLY_EVENT_KEY });
                     app.emit('interfacePage', { key: patron_detail.item.repeater, params: patronIndex });
                     app.emit('interfacePage', { key: start.prop.repeater });
+                    app.emit('interfacePage', { key: RECEIPT_EVENT_KEY, params: patronIndex });
                 }
             }
         ],
@@ -199,6 +235,21 @@ app.on(`lineChange[#${patron_detail.item.repeater}]`, (event, repeater, rowindex
             }
         ]
     }).open();
+});
+
+$(document).on('change', '#mark-as-paid', (e) => {
+    const isChecked = e.target.checked; 
+    
+    updatePatronPaidStatus(window.personIndex, isChecked);
+
+    if (isChecked) {
+        $(patron_detail.paid.container).append(patron_detail.paid.component);
+    }
+    else {
+        $(patron_detail.paid.stamp).remove();
+    }
+
+    app.emit('interfacePage', { key: start.prop.repeater });
 });
 
 /**
