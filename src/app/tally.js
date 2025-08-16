@@ -1,16 +1,11 @@
 // /src/app/tally.js
-import { getStorage, setStorage } from '@/app/utils';
-import { BILL_EVENT_KEY, PATRONS_KEY, BILL_KEY, TALLY_EVENT_KEY } from '@/app/constants';
+import { purgeStorage, getStorage, setStorage } from '@/app/utils';
+import { TALLY_EVENT_KEY, PATRONS_KEY, BILL_KEY } from '@/app/constants';
 
-/*
-export const tally = {
-    key: 'tally-3987'
-};
-
-export const TALLY_KEY = BILL_KEY;
-const PATRONS_KEY = person.patrons_store;
-*/
-
+/**
+ * Function get the tally
+ * @returns
+ */
 export function getTally() {
     const state = getStorage(BILL_KEY);
     if (state && typeof state === 'object' && !Array.isArray(state)) {
@@ -25,6 +20,11 @@ export function getTally() {
     }
 }
 
+/**
+ * Function to set the tally
+ * @param {*} next 
+ * @param {*} meta 
+ */
 export function setTally(next = {}, meta = {}) {
     // 1) Read patrons
     const patrons = getStorage(PATRONS_KEY) || [];
@@ -56,7 +56,13 @@ export function setTally(next = {}, meta = {}) {
     app.emit('interfacePage', { key: TALLY_EVENT_KEY });
 }
 
-export function unsetTally() {
-    localStorage.removeItem(BILL_KEY);
-    app.emit('interfacePage', { key: BILL_EVENT_KEY });
+/**
+ * Function to reset tally
+ * @param {*} state 
+ * @returns 
+ */
+export function unsetTally(state = false) {
+    if (state) return;
+    purgeStorage(BILL_KEY);
+    app.emit('interfacePage', { key: TALLY_EVENT_KEY });
 }
