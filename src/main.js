@@ -1,7 +1,7 @@
 // CSS IMPORTS HERE
 import '@/styles/calc-sheet.css';
 import '@/styles/overrides.css';
-//import '@/styles/components.css';
+import '@/styles/paid-stamp.css';
 
 // JS IMPORTS HERE
 import { logger } from '@/app/log';
@@ -11,6 +11,7 @@ import '@/core/tally-tab';
 
 import { initRevenueCat } from '@/services/revenuecat';
 import { showInterstitialAd } from '@/services/admob';
+import { setFeatureMap, simulatePremium } from '@/services/premium';
 
 /**
  * Version loader
@@ -45,10 +46,16 @@ async function getConfig() {
  */
 async function appStart() {
     const appConfig = await getConfig();
+    const isPremium = appConfig.simulate_premium ?? false;
+    const featureConfig = appConfig.premium_features;
+
+    simulatePremium(premConfig);
+    setFeatureMap(featureConfig);
 
     await showInterstitialAd(appConfig);
     await loadAppVersion();
-    await initRevenueCat(appConfig);
+    
+    if (!isPremium) await initRevenueCat(appConfig);
 
     if (app.initialized === true) {
         initApp();
