@@ -2,4 +2,3 @@
 .btn-json-page { cursor: pointer; user-select: none; }
 .btn-json-page.is-active { outline: 2px solid #10b981; font-weight: 700; }
 .btn-json-page.is-disabled { opacity: .45; pointer-events: none; }
-
