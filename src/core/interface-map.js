@@ -7,10 +7,11 @@ import { updateBill } from '@/app/ui';
 import { updateTally } from '@/app/ui';
 import { updateAdd } from '@/app/ui';
 import { updateItem } from '@/app/ui';
-import { BILL_EVENT_KEY, TALLY_EVENT_KEY } from '@/app/constants';
-
+import { updateReceipt } from '@/app/ui';
+import { BILL_EVENT_KEY,RECEIPT_EVENT_KEY, TALLY_EVENT_KEY } from '@/app/constants';
 
 export const interfaceMap = {
+    [RECEIPT_EVENT_KEY]: (params) => updateReceipt(patron_detail.receipt, params),
     [BILL_EVENT_KEY]: () => updateBill(start.bill),
     [TALLY_EVENT_KEY]: () => updateTally(start.tally),
     [start.prop.repeater]: () => updateRepeater(start.prop, updatePatrons(), true),
