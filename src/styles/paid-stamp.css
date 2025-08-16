@@ -1,0 +1,19 @@
+.receipt-wrapper {
+  position: relative;
+}
+
+.receipt-paid-stamp {
+  content: "PAID";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-20deg);
+  font-size: 42px;
+  font-weight: 900;
+  color: rgba(220, 38, 38, 0.25); /* red-600, transparent */
+  pointer-events: none;
+  z-index: 10;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  user-select: none;
+}
