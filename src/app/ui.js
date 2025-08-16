@@ -165,7 +165,12 @@ export function updateTally(prop) {
     $(prop.total).text(`$${tallyTotal.toFixed(2)}`);
 }
 
-
+/**
+ * Function to update receipt badge
+ * @param {*} prop 
+ * @param {*} index 
+ * @returns 
+ */
 export function updateReceipt(prop, index) {
     const patrons = getStorage(PATRONS_KEY) || [];
     const patron = patrons && Number.isInteger(index) ? patrons[index] : null;
