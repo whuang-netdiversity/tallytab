@@ -1,6 +1,6 @@
 // /src/app/bill.js
-import { getStorage, setStorage } from '@/app/utils';
-import { BILL_KEY, BILL_EVENT_KEY, TALLY_EVENT_KEY } from '@/app/constants';
+import { purgeStorage, getStorage, setStorage } from '@/app/utils';
+import { DRAFT_KEY, BILL_KEY, BILL_EVENT_KEY, TALLY_EVENT_KEY } from '@/app/constants';
 
 /**
  * Get the bill object from storage.
@@ -29,9 +29,19 @@ export function setBill(data = {}) {
 }
 
 /**
- * Removes bill from storage
+ * Function to reset bill
+ * @param {*} state 
  */
-export function unsetBill() {
-    localStorage.removeItem(BILL_KEY);
+export function unsetBill(state = false) {
+    if (state) return;
+    purgeStorage(BILL_KEY);
     app.emit('interfacePage', { key: BILL_EVENT_KEY });
+}
+
+export function setBillState(isDraft = false) {
+    setStorage(DRAFT_KEY, isDraft);
+}
+
+export function getBillState() {
+    return getStorage(DRAFT_KEY);
 }
