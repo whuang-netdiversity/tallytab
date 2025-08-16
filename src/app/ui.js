@@ -83,7 +83,9 @@ export function updateAdd() {
 export function updatePatrons() {
     const base = (getStorage(PATRONS_KEY) || []).map(p => ({
         ...p,
-        amt: p.amt ? `$${parseFloat(p.amt).toFixed(2)}` : '$0.00'
+        amt: p.paid
+            ? `💳 ${p.amt ? `$${parseFloat(p.amt).toFixed(2)}` : '$0.00'}`
+            : `⏳ ${p.amt ? `$${parseFloat(p.amt).toFixed(2)}` : '$0.00'}`
     }));
 
     return [
@@ -161,4 +163,24 @@ export function updateTally(prop) {
     }
 
     $(prop.total).text(`$${tallyTotal.toFixed(2)}`);
+}
+
+
+export function updateReceipt(prop, index) {
+    const patrons = getStorage(PATRONS_KEY) || [];
+    const patron = patrons && Number.isInteger(index) ? patrons[index] : null;
+    const { tipPct = 0 } = getBill();
+
+    if (!patron || !Array.isArray(patron.items) || patron.items.length === 0) {
+        return [];
+    }
+
+    const amtBeforeTip = patron.amt / ( 1 + tipPct / 100);
+    const tip = patron.amt - amtBeforeTip;
+
+    $(prop.title).html(`<h2 class="text-align-center">🍺 Tally Tab<br><small>${patron.label}'s Receipt</small></h2>`);
+    $(prop.subtotal).text(`$${amtBeforeTip.toFixed(2)}`);
+    $(prop.tip_msg).html(`Tip (${tipPct}%)<br><small>*Based on shared tip rate</small>`);
+    $(prop.tip).text(`$${tip.toFixed(2)}`);
+    $(prop.total).text(`$${patron.amt.toFixed(2)}`);
 }
