@@ -38,10 +38,18 @@ export function unsetBill(state = false) {
     app.emit('interfacePage', { key: BILL_EVENT_KEY });
 }
 
+/**
+ * Function to set bill state
+ * @param {*} isDraft 
+ */
 export function setBillState(isDraft = false) {
     setStorage(DRAFT_KEY, isDraft);
 }
 
+/**
+ * Functino get bill state
+ * @returns 
+ */
 export function getBillState() {
     return getStorage(DRAFT_KEY);
 }
