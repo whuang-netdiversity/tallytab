@@ -2,6 +2,7 @@
 import { logger } from '@/app/log';
 import { isRevenueCatReady } from '@/services/revenuecat';
 import { purchasePremium, restorePurchases } from '@/services/revenuecat';
+import { setStorage, getStorage } from '@/app/utils';
 
 export const premium = {
     icon_container: '#right-o-1009',
@@ -13,17 +14,31 @@ export const premium = {
 
 const PRODUCT_ID = 'full_version_unlock';
 const STORAGE_KEY = 'is_premium';
+const PREMIUM_KEY = 'premium_features';
 
-const PREMIUM_FEATURES = {
-    'remove_ads': true
-};
+/**
+ * Function to map feature toggles
+ * @param {*} map 
+ */
+export function setFeatureMap(map = {}) {
+    setStorage(PREMIUM_KEY, map);
+    logger.info('[premium] Premium feature toggle mapped');
+}
+
+/**
+ * Function to get feature toggles
+ * @returns 
+ */
+export function getFeatureMap() {
+    return getStorage(PREMIUM_KEY);
+}
 
 /**
  * Function to check premium flag
  * @returns 
  */
 export function isPremium() {
-    return localStorage.getItem(STORAGE_KEY) === '1';
+    return getStorage(STORAGE_KEY) === '1';
 }
 
 /**
@@ -32,7 +47,7 @@ export function isPremium() {
  */
 export async function getPremium() {
     if (!isRevenueCatReady()) {
-        console.warn('[Premium] Skipping purchase – RevenueCat not ready.');
+        logger.warn('[Premium] Skipping purchase – RevenueCat not ready.');
         return;
     }
 
@@ -68,7 +83,7 @@ export async function updatePremium() {
  * @param {*} enabled 
  */
 export function setPremium(enabled = true) {
-    localStorage.setItem(STORAGE_KEY, enabled ? '1' : '0');
+    setStorage(STORAGE_KEY, enabled ? '1' : '0');
     logger.info('[premium] Premium mode set:', enabled);
 }
 
@@ -79,10 +94,20 @@ export function setPremium(enabled = true) {
  * @returns 
  */
 export function gateFeature(key, { showDialog = false, fallback = null } = {}) {
-    const gated = !!PREMIUM_FEATURES[key];
+    const premium_features = getFeatureMap();
+    const featureValue = premium_features[key];
+
+    // ✅ If explicitly unlocked, allow regardless of isPremium()
+    if (featureValue === false) {
+        logger.info('[premium] gateFeature UNLOCKED for all users:', { key });
+        return true;
+    }
+
+    // ✅ If gated, only allow if premium
+    const gated = !!featureValue;
     const allowed = !gated || isPremium();
 
-    logger.info('[premium] gateFeature check:', {key, gated, allowed});
+    logger.info('[premium] gateFeature check:', { key, gated, allowed });
 
     if (!allowed && showDialog) {
         app.dialog.alert('🔒 This is a premium feature. Upgrade to unlock.');
@@ -93,9 +118,10 @@ export function gateFeature(key, { showDialog = false, fallback = null } = {}) {
 
 /**
  * Function to simulate premium
+ * @param {*} flag 
  */
-export function simulatePremium() {
-    setPremium(true);
+export function simulatePremium(flag = true) {
+    setPremium(flag);
     logger.success('[premium] Simulated premium unlock');
 }
 
