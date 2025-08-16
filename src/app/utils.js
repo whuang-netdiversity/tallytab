@@ -54,3 +54,11 @@ export function getStorage(key, fallback = null) {
         return fallback;
     }
 }
+
+/**
+ * Remove local storage by key
+ * @param {*} key 
+ */
+export function purgeStorage(key) {
+    localStorage.removeItem(key);
+}
