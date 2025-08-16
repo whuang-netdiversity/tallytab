@@ -1,11 +1,7 @@
 // /src/app/person.js
+import { start } from '@/pages/start';
 import { getStorage, setStorage } from '@/app/utils';
 import { PATRONS_KEY } from '@/app/constants';
-/*
-export const person = {
-    patrons_store: 'tally_tab:patrons',
-};
-*/
 
 /**
  * Add person
@@ -18,7 +14,7 @@ export function addPatron(name, amt = '0.00') {
     if (!trimmed) return false;
 
     const list = getStorage(PATRONS_KEY) || [];
-    list.push({ label: trimmed, amt: String(amt), items: [] });
+    list.push({ label: trimmed, amt: String(amt), paid: false, items: [] });
     setStorage(PATRONS_KEY, list);
 
     return true;
@@ -43,14 +39,21 @@ export function removePatron(name) {
 
 /**
  * Removes patrons from storage
- * @returns 
+ * @param {*} state 
+ * @returns
  */
-export function unsetPatrons() {
+export function unsetPatrons(state = false) {
+    if (state) return;
     localStorage.removeItem(PATRONS_KEY);
-    return true;
+    app.emit('interfacePage', { key: start.prop.repeater });
 }
 
-
+/**
+ * Add a patron to the tab list
+ * @param {*} patronIndex 
+ * @param {*} param1 
+ * @returns 
+ */
 export function addItemToPatron(patronIndex, { label, qty, amt, type }) {
     const list = getStorage(PATRONS_KEY) || [];
     const patron = list[patronIndex];
@@ -77,6 +80,12 @@ export function addItemToPatron(patronIndex, { label, qty, amt, type }) {
     return true;
 }
 
+/**
+ * Remove a patron from the tab list
+ * @param {*} patronIndex 
+ * @param {*} itemIndex 
+ * @returns 
+ */
 export function removeItemFromPatron(patronIndex, itemIndex) {
     const list = getStorage(PATRONS_KEY) || [];
     const patron = list[patronIndex];
@@ -94,6 +103,22 @@ export function removeItemFromPatron(patronIndex, itemIndex) {
     }
 
     patron.amt = (Math.round(subtotal * 100) / 100).toFixed(2);
+    setStorage(PATRONS_KEY, list);
+    return true;
+}
+
+/**
+ * Update patron tab status
+ * @param {*} patronIndex 
+ * @param {*} isPaid 
+ * @returns 
+ */
+export function updatePatronPaidStatus(patronIndex, isPaid = false) {
+    const list = getStorage(PATRONS_KEY) || [];
+    const patron = list[patronIndex];
+    if (!patron || !Array.isArray(patron.items)) return false;
+
+    patron.paid = isPaid;
     setStorage(PATRONS_KEY, list);
     return true;
 }
