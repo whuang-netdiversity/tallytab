@@ -1,6 +1,9 @@
 import { routeMap } from '@/core/route-map';
+import { start } from '@/pages/start';
 import { interfaceMap } from '@/core/interface-map';
 import { patron_detail } from '@/pages/patron-detail';
+import { RECEIPT_EVENT_KEY } from '@/app/constants';
+import { BILL_EVENT_KEY, TALLY_EVENT_KEY } from '@/app/constants';
 
 app.on('routePage', ({ key, params }) => {
     if (typeof routeMap[key] === 'function') {
@@ -15,8 +18,12 @@ app.on('interfacePage', ({ key, params }) => {
 });
 
 app.on('jsonRepeaterInitialized', ({ id: repeaterId }) => {
+    app.emit('interfacePage', { key: BILL_EVENT_KEY });
+    app.emit('interfacePage', { key: TALLY_EVENT_KEY });
+
     if (repeaterId == patron_detail.item.repeater) {
         app.emit('interfacePage', { key: patron_detail.item.repeater, params: window.personIndex });
+        app.emit('interfacePage', { key: RECEIPT_EVENT_KEY, params: window.personIndex });
     }
     else {
         app.emit('interfacePage', { key: repeaterId });
