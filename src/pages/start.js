@@ -12,13 +12,13 @@ import {
 
 import { patron_detail } from '@/pages/patron-detail';
 
-import { unsetBill } from '@/app/bill';
+import { getBillState, setBillState, unsetBill } from '@/app/bill';
 import { addPatron, unsetPatrons } from '@/app/person';
 import { getStorage } from '@/app/utils';
 import { logger } from '@/app/log';
 import { removePatron } from '@/app/person';
 import { mountCalcSheet, openCalc } from '@/services/calc-sheet';
-import { BILL_EVENT_KEY, TALLY_EVENT_KEY, PATRONS_KEY } from '@/app/constants';
+import { PATRONS_KEY } from '@/app/constants';
 import { unsetTally } from '@/app/tally';
 
 export const start = {
@@ -46,7 +46,17 @@ export const start = {
         message: '#div-1222',
         repeater: 'repeater-1169',
         repeater_container: '#div-1151'
-    },    
+    },
+    checkbox: {
+        draft_container: '#div-1346',
+        draft_component: '<div class="display-flex align-items-center margin-top">\
+            <label class="checkbox display-flex align-items-center">\
+                <input type="checkbox" id="save-as-draft">\
+                <i class="icon-checkbox"></i>\
+                <span class="margin-left-half">Save this bill as draft</span>\
+            </label>\
+        </div>'
+    }
 };
 
 let tipActive = null;
@@ -64,13 +74,15 @@ $(document).on('page:init', '.page[data-name="index"]', ({ detail: page }) => {
  * Function initializing app
  */
 export function initApp() {
-    unsetBill();
-    unsetTally();
-    unsetPatrons();
-    app.emit('interfacePage', { key: BILL_EVENT_KEY });
+    const billState = getBillState();
+    $(start.checkbox.draft_container).html(start.checkbox.draft_component);
+    $('#save-as-draft').prop('checked', billState === true);        
+
+    unsetBill(billState);
+    unsetTally(billState);
+    unsetPatrons(billState);
 
     $(start.nav_title).text(`Tally Tab v${window.appVersion}`);
-    //$(start.bill.total).text(`$${total.toFixed(2)}`);
     $(start.tally.total).text('$0.00');
 
     $(start.bill.info).text(start.bill.msg);
@@ -202,7 +214,7 @@ app.on(`lineChange[#${start.prop.repeater}]`, (event, repeater, rowindex, item) 
             {
                 text: `🍽️ View Tab ⮕\n<small>${patron.label}</small>`,
                 onClick: () => {
-                    app.emit('routePage', { key: patron_detail.key, params: item  });
+                    app.emit('routePage', { key: patron_detail.key, params: patron });
                 }
             },
             {
@@ -236,12 +248,13 @@ $(document).on('click', start.tally.section, (e) => {
 
         // Reset bill/tally totals
         unsetBill();
+        unsetTally();
         unsetPatrons();
-
-        // Refresh repeater to empty state (only "+ Add Person" row remains)
-        app.emit('interfacePage', { key: BILL_EVENT_KEY });
-        app.emit('interfacePage', { key: TALLY_EVENT_KEY });
-        app.emit('interfacePage', { key: start.prop.repeater });
     });
 });
 
+$(document).on('change', '#save-as-draft', (e) => {
+    const isChecked = e.target.checked; 
+
+    setBillState(isChecked);
+});
