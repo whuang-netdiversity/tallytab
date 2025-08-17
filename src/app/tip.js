@@ -1,5 +1,6 @@
 // /src/app/tip.js
 import { getBill, setBill } from '@/app/bill';
+import { BILL_EVENT_KEY } from '@/app/constants';
 
 export const currencyToNumber = (val) => {
     return parseFloat(String(val || '').replace(/[^0-9.-]+/g, '')) || 0;
@@ -31,8 +32,7 @@ export function applyTip(prop, pct) {
     setBill({ ...bill, tipPct: Number(pct) || 0 }, { source: 'tip' });
 
     // Optional inline info text for immediate feedback on the tip screen
-    const total = bill.baseTotal * (1 + pct / 100);
-    $(prop.info).text(`💸 +${pct}% tip: $${(total - bill.baseTotal).toFixed(2)}`);
+    app.emit('interfacePage', { key: BILL_EVENT_KEY });
 }
 
 
@@ -142,7 +142,7 @@ function setCustomBadgeInactive(selector) {
 
 /**
  * Make the tip badges reflect the current tip percentage.
- * @param {Object} tipMap
+ * @param {object} tipMap
  * @param {number} tipPct
  */
 export function reflectTipBadges(tipMap, tipPct) {
