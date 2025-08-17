@@ -108,7 +108,7 @@ export function updateBill(prop) {
 
     // Paint totals
     if (tipAmount > 0) {
-        $(prop.info).text(`+${Number(tipPct)}% added`);
+        $(prop.info).text(`💸 +${Number(tipPct)}% tip: $${tipAmount.toFixed(2)}`);
     } 
     else {
         $(prop.info).text(prop.msg);
