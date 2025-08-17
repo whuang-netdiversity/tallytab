@@ -34,6 +34,8 @@ export function setBill(data = {}) {
  */
 export function unsetBill(state = false) {
     if (state) return;
+
+    // Save and emit UI refresh
     purgeStorage(BILL_KEY);
     app.emit('interfacePage', { key: BILL_EVENT_KEY });
 }
