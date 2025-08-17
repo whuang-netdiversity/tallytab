@@ -45,7 +45,7 @@ export function removePatron(name) {
 export function unsetPatrons(state = false) {
     if (state) return;
     localStorage.removeItem(PATRONS_KEY);
-    app.emit('interfacePage', { key: start.prop.repeater });
+    app.emit('interfacePage', { key: start.prop });
 }
 
 /**
