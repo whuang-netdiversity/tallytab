@@ -1,7 +1,8 @@
 // /src/app/person.js
 import { start } from '@/pages/start';
 import { getStorage, setStorage } from '@/app/utils';
-import { PATRONS_KEY } from '@/app/constants';
+import { RECEIPT_EVENT_KEY, PATRONS_KEY } from '@/app/constants';
+import { patron_detail } from '@/pages/patron-detail';
 
 /**
  * Add person
@@ -15,8 +16,11 @@ export function addPatron(name, amt = '0.00') {
 
     const list = getStorage(PATRONS_KEY) || [];
     list.push({ label: trimmed, amt: String(amt), paid: false, items: [] });
+    
+    // Save and emit UI refresh
     setStorage(PATRONS_KEY, list);
-
+    app.emit('interfacePage', { key: start.prop.repeater });
+    
     return true;
 }
 
@@ -33,7 +37,10 @@ export function removePatron(name) {
 
     if (filtered.length === patrons.length) return false;
 
+    // Save and emit UI refresh
     setStorage(PATRONS_KEY, filtered);
+    app.emit('interfacePage', { key: start.prop.repeater });
+
     return true;
 }
 
@@ -44,6 +51,9 @@ export function removePatron(name) {
  */
 export function unsetPatrons(state = false) {
     if (state) return;
+
+
+    // Save and emit UI refresh
     localStorage.removeItem(PATRONS_KEY);
     app.emit('interfacePage', { key: start.prop });
 }
@@ -76,7 +86,13 @@ export function addItemToPatron(patronIndex, { label, qty, amt, type }) {
     }
 
     patron.amt = (Math.round(subtotal * 100) / 100);
+
+    // Save and emit UI refresh
     setStorage(PATRONS_KEY, list);
+    app.emit('interfacePage', { key: patron_detail.item.repeater, params: patronIndex });
+    app.emit('interfacePage', { key: start.prop.repeater });    
+    app.emit('interfacePage', { key: RECEIPT_EVENT_KEY, params: patronIndex });
+
     return true;
 }
 
@@ -102,8 +118,14 @@ export function removeItemFromPatron(patronIndex, itemIndex) {
         subtotal += q * unit;
     }
 
-    patron.amt = (Math.round(subtotal * 100) / 100).toFixed(2);
+    patron.amt = (Math.round(subtotal * 100) / 100);
+
+    // Save and emit UI refresh
     setStorage(PATRONS_KEY, list);
+    app.emit('interfacePage', { key: patron_detail.item.repeater, params: patronIndex });
+    app.emit('interfacePage', { key: start.prop.repeater });
+    app.emit('interfacePage', { key: RECEIPT_EVENT_KEY, params: patronIndex });
+
     return true;
 }
 
@@ -119,6 +141,10 @@ export function updatePatronPaidStatus(patronIndex, isPaid = false) {
     if (!patron || !Array.isArray(patron.items)) return false;
 
     patron.paid = isPaid;
+
+    // Save and emit UI refresh
     setStorage(PATRONS_KEY, list);
+    app.emit('interfacePage', { key: start.prop.repeater });
+
     return true;
 }
