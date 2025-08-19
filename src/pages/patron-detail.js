@@ -4,8 +4,7 @@ import { getStorage } from '@/app/utils';
 import { prevPath, nextPath } from '@/app/utils';
 import { updatePatronPaidStatus, addItemToPatron, removeItemFromPatron } from '@/app/person';
 import { setTally } from '@/app/tally';
-import { start } from '@/pages/start';
-import { TALLY_EVENT_KEY, PATRONS_KEY, RECEIPT_EVENT_KEY } from '@/app/constants';
+import { PATRONS_KEY } from '@/app/constants';
 
 export const patron_detail = {
     key: 'detail-3982',
@@ -177,12 +176,6 @@ app.on(`lineChange[#${patron_detail.add.repeater}]`, () => {
                     // Store item and auto-update patron.amt via your helper
                     addItemToPatron(patronIndex, { label, qty, amt, type });
                     setTally();
-
-                    // Kick your existing UI refresh (already abstracted elsewhere)
-                    app.emit('interfacePage', { key: TALLY_EVENT_KEY });
-                    app.emit('interfacePage', { key: patron_detail.item.repeater, params: patronIndex });
-                    app.emit('interfacePage', { key: start.prop.repeater });
-                    app.emit('interfacePage', { key: RECEIPT_EVENT_KEY, params: patronIndex });
                 }
             }
         ],
@@ -224,7 +217,6 @@ app.on(`lineChange[#${patron_detail.item.repeater}]`, (event, repeater, rowindex
                         () => {
                             removeItemFromPatron(patronIndex, index);
                             setTally();
-                            app.emit('interfacePage', { key: patron_detail.item.repeater });
                         }
                     );
                 }
@@ -248,8 +240,6 @@ $(document).on('change', '#mark-as-paid', (e) => {
     else {
         $(patron_detail.paid.stamp).remove();
     }
-
-    app.emit('interfacePage', { key: start.prop.repeater });
 });
 
 /**
