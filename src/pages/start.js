@@ -10,6 +10,7 @@ import {
     clearAnyTipAndResetBadges
 } from '@/app/tip';
 
+import { bills_detail } from '@/pages/bills_detail';
 import { patron_detail } from '@/pages/patron-detail';
 
 import { getBillState, setBillState, unsetBill } from '@/app/bill';
@@ -20,6 +21,7 @@ import { removePatron } from '@/app/person';
 import { mountCalcSheet, openCalc } from '@/services/calc-sheet';
 import { PATRONS_KEY } from '@/app/constants';
 import { unsetTally } from '@/app/tally';
+import { archiveBill } from '@/app/history';
 
 export const start = {
     key: 'index-2834',
@@ -56,6 +58,11 @@ export const start = {
                 <span class="margin-left-half">Save this bill as draft</span>\
             </label>\
         </div>'
+    },
+    finish: {
+        container: '#div-1336',
+        archive: '#button-1340',
+        view: '#button-1341'
     }
 };
 
@@ -80,7 +87,6 @@ export function initApp() {
 
     unsetBill(billState);
     unsetTally(billState);
-    unsetPatrons(billState);
 
     $(start.nav_title).text(`Tally Tab v${window.appVersion}`);
     $(start.tally.total).text('$0.00');
@@ -198,7 +204,6 @@ app.on(`lineChange[#${start.prop.repeater}]`, (event, repeater, rowindex, item) 
     if (index === lastIndex) {
         const dialog = app.dialog.prompt('👤 Enter tab name', '➕ Add Tab', (name) => {
             if (!addPatron(name)) return;
-            app.emit('interfacePage', { key: start.prop.repeater });
         });
         dialog.$el.find('input').attr('placeholder', 'e.g., Mike, Table 5, Kitchen');
         dialog.open();
@@ -226,7 +231,6 @@ app.on(`lineChange[#${start.prop.repeater}]`, (event, repeater, rowindex, item) 
                         '⚠️ Confirm Remove',
                         () => {
                             removePatron(patron.label);
-                            app.emit('interfacePage', { key: start.prop.repeater });
                         }
                     );
                 }
@@ -257,4 +261,21 @@ $(document).on('change', '#save-as-draft', (e) => {
     const isChecked = e.target.checked; 
 
     setBillState(isChecked);
+});
+
+
+$(document).on('click', start.finish.archive, (e) => {
+    e.preventDefault();
+
+    archiveBill();
+    setBillState(false);
+    initApp();
+
+    app.dialog.alert('This bill has been archived.');
+});
+
+$(document).on('click', start.finish.view, (e) => {
+    e.preventDefault();
+
+    app.emit('routePage', { key: bills_detail.key });
 });
