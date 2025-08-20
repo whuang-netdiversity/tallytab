@@ -143,3 +143,14 @@ export const getLocalISODate = (date = new Date()) => {
 export const capitalize = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export const getLocalTimestamp = (date = new Date()) => {
+    return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    }); // e.g., "Aug 19, 2025, 6:42 PM"
+};
