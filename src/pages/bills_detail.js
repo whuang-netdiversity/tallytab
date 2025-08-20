@@ -32,7 +32,7 @@ app.on(`lineChange[#${bills_detail.prop.repeater}]`, (event, repeater, rowindex,
         `Are you sure you want to remove the bill on <b>${item.date}</b>?`,
         '⚠️ Confirm Remove',
         () => {
-            removeBillFromHistory(index);
+            removeBillFromHistory(item.date);
         }
     );    
 });

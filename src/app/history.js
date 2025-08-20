@@ -35,16 +35,16 @@ export function archiveBill() {
 
 /**
  * Function to remove bill
- * @param {*} index 
+ * @param {*} key 
  * @returns 
  */
-export function removeBillFromHistory(index) {
+export function removeBillFromHistory(key) {
     const list = getStorage(HISTORY_KEY) || [];
 
-    list.splice(index, 1);
+    const next = list.filter(bill => bill.date !== key);
     
     // Save and emit UI refresh
-    setStorage(HISTORY_KEY, list);
+    setStorage(HISTORY_KEY, next);
     app.emit('interfacePage', { key: bills_detail.prop.repeater });
 
     return true;
