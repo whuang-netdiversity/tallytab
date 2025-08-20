@@ -269,6 +269,7 @@ $(document).on('click', start.finish.archive, (e) => {
 
     archiveBill();
     setBillState(false);
+    unsetPatrons();
     initApp();
 
     app.dialog.alert('This bill has been archived.');
