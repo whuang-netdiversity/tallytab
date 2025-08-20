@@ -5,7 +5,16 @@ import { RECEIPT_EVENT_KEY, PATRONS_KEY } from '@/app/constants';
 import { patron_detail } from '@/pages/patron-detail';
 
 /**
- * Add person
+ * Function to 
+ * @returns
+ */
+export function getPatrons() {
+    return getStorage(PATRONS_KEY) || [];
+}
+
+
+/**
+ * Return list of patrons
  * @param {*} name
  * @param {*} amt
  * @returns
@@ -50,12 +59,11 @@ export function removePatron(name) {
  * @returns
  */
 export function unsetPatrons(state = false) {
-    if (state) return;
-
+    if (state) return app.emit('interfacePage', { key: start.prop.repeater });
 
     // Save and emit UI refresh
     localStorage.removeItem(PATRONS_KEY);
-    app.emit('interfacePage', { key: start.prop });
+    app.emit('interfacePage', { key: start.prop.repeater });
 }
 
 /**
