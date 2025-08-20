@@ -33,6 +33,11 @@ export function archiveBill() {
     return true;   
 }
 
+/**
+ * Function to remove bill
+ * @param {*} index 
+ * @returns 
+ */
 export function removeBillFromHistory(index) {
     const list = getStorage(HISTORY_KEY) || [];
     const bill = list[index];
