@@ -2,7 +2,7 @@ import { logger } from '@/app/log';
 import { getStorage } from '@/app/utils';
 import { getBill } from '@/app/bill';
 import { getTally } from '@/app/tally';
-import { PATRONS_KEY } from '@/app/constants';
+import { HISTORY_KEY, PATRONS_KEY } from '@/app/constants';
 
 /**
  * Function to update contents in a repeater
@@ -81,17 +81,34 @@ export function updateAdd() {
  * @returns 
  */
 export function updatePatrons() {
-    const base = (getStorage(PATRONS_KEY) || []).map(p => ({
+    const patrons = getStorage(PATRONS_KEY) || [];
+    const base = patrons.map(p => ({
         ...p,
-        amt: p.paid
+        info: p.paid
             ? `💳 ${p.amt ? `$${parseFloat(p.amt).toFixed(2)}` : '$0.00'}`
             : `⏳ ${p.amt ? `$${parseFloat(p.amt).toFixed(2)}` : '$0.00'}`
     }));
 
     return [
         ...base,
-        { label: '+ Add Tab', amt: '' }
+        { label: '+ Add Tab', info: '' }
     ];
+}
+
+/**
+ * Function to update historical content
+ * @returns 
+ */
+export function updateHistory() {
+    const history = getStorage(HISTORY_KEY) || [];
+
+    return history
+        .sort((a, b) => new Date(b.date) - new Date(a.date)) // recent first
+        .map(h => ({
+            ...h,
+            total: `$${parseFloat(h.baseTotal).toFixed(2)} + ${h.tipPct}%`,
+            tally: `$${parseFloat(h.tallyTotal).toFixed(2)}`
+        }));
 }
 
 /**
