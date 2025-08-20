@@ -104,11 +104,17 @@ export function updateHistory() {
 
     return history
         .sort((a, b) => new Date(b.date) - new Date(a.date)) // recent first
-        .map(h => ({
-            ...h,
-            total: `$${parseFloat(h.baseTotal).toFixed(2)} + ${h.tipPct}%`,
-            tally: `$${parseFloat(h.tallyTotal).toFixed(2)}`
-        }));
+        .map(h => {
+            const base = parseFloat(h.baseTotal) || 0;
+            const pct = parseFloat(h.tipPct) || 0;
+            const totalWithTip = base + (base * pct / 100);
+
+            return {
+                ...h,
+                total: `$${totalWithTip.toFixed(2)} (${pct}%)`,
+                tally: `$${parseFloat(h.tallyTotal).toFixed(2)}`
+            };
+        });
 }
 
 /**
