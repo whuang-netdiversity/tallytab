@@ -40,7 +40,6 @@ export function archiveBill() {
  */
 export function removeBillFromHistory(index) {
     const list = getStorage(HISTORY_KEY) || [];
-    const bill = list[index];
 
     list.splice(index, 1);
     
