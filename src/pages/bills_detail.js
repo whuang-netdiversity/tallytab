@@ -1,3 +1,4 @@
+import { removeBillFromHistory } from '@/app/history';
 import { logger } from '@/app/log';
 import { prevPath, nextPath } from '@/app/utils';
 
@@ -22,6 +23,18 @@ $(document).on('page:init', '.page[data-name="bills_detail"]', ({ detail: page }
 
     $(bills_detail.back_button).removeClass('back');
     logger.info('bills detail page reloaded:', JSON.stringify(query));
+});
+
+app.on(`lineChange[#${bills_detail.prop.repeater}]`, (event, repeater, rowindex, item) => {
+    const { dataindex: index } = item;
+
+    app.dialog.confirm(
+        `Are you sure you want to remove the bill on <b>${item.date}</b>?`,
+        '⚠️ Confirm Remove',
+        () => {
+            removeBillFromHistory(index);
+        }
+    );    
 });
 
 /**

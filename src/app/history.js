@@ -1,4 +1,5 @@
 // /src/app/history.js
+import { bills_detail } from '@/pages/bills_detail';
 import { getLocalTimestamp } from '@/app/helpers';
 import { getBill } from '@/app/bill';
 import { getPatrons } from '@/app/person';
@@ -30,4 +31,17 @@ export function archiveBill() {
     setStorage(HISTORY_KEY, list);
 
     return true;   
+}
+
+export function removeBillFromHistory(index) {
+    const list = getStorage(HISTORY_KEY) || [];
+    const bill = list[index];
+
+    list.splice(index, 1);
+    
+    // Save and emit UI refresh
+    setStorage(HISTORY_KEY, list);
+    app.emit('interfacePage', { key: bills_detail.prop.repeater });
+
+    return true;
 }
