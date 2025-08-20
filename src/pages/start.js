@@ -263,7 +263,6 @@ $(document).on('change', '#save-as-draft', (e) => {
     setBillState(isChecked);
 });
 
-
 $(document).on('click', start.finish.archive, (e) => {
     e.preventDefault();
 
