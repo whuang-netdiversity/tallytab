@@ -1,8 +1,8 @@
 // /src/app/admob.js
 import { logger } from '@/app/log';
 import { AdMob } from '@capacitor-community/admob';
-import { isCapacitor } from '@/services/capacitor';
-import { gateFeature } from '@/services/premium';
+import { isCapacitor, isPlatform } from '@/services/capacitor';
+import { shouldShowAds } from '@/services/premium';
 
 /**
  * Function to inject admob interstitial ads
@@ -12,13 +12,12 @@ import { gateFeature } from '@/services/premium';
 export async function showInterstitialAd(config) {
     if (!isCapacitor()) return false;
 
-    const feature_allowed = gateFeature('remove_ads');
-
-    if (!feature_allowed) {
+    if (!shouldShowAds()) {
         logger.info('[AdMob] Ads removed for premium user');
         return;
     }
     
+    const platform = isPlatform();
     const isPrd = config.admob.ads === 'prd';
 
     document.addEventListener('deviceready', async () => {
@@ -42,7 +41,7 @@ export async function showInterstitialAd(config) {
 
             // Set up the ad unit Id
             await AdMob.prepareInterstitial({
-                adId: config.admob.adId,
+                adId: config.admob[platform].adId,
                 isTesting: !isPrd,
                 npa: true
             });

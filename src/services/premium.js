@@ -93,27 +93,18 @@ export function setPremium(enabled = true) {
  * @param {*} param1 
  * @returns 
  */
-export function gateFeature(key, { showDialog = false, fallback = null } = {}) {
+export function gateFeature(key, { showDialog = false } = {}) {
     const premium_features = getFeatureMap();
-    const featureValue = premium_features[key];
+    const gated = premium_features[key] === true;
+    const allowed = gated ? isPremium() : false;
 
-    // ✅ If explicitly unlocked, allow regardless of isPremium()
-    if (featureValue === false) {
-        logger.info('[premium] gateFeature UNLOCKED for all users:', { key });
-        return true;
-    }
+    logger.info('[premium] gateFeature', { key, gated, allowed });
 
-    // ✅ If gated, only allow if premium
-    const gated = !!featureValue;
-    const allowed = !gated || isPremium();
-
-    logger.info('[premium] gateFeature check:', { key, gated, allowed });
-
-    if (!allowed && showDialog) {
+    if (!allowed && gated && showDialog) {
         app.dialog.alert('🔒 This is a premium feature. Upgrade to unlock.');
     }
 
-    return allowed ? true : fallback;
+    return allowed;
 }
 
 /**
@@ -139,4 +130,13 @@ export async function updatePremiumIcon() {
         $(premium.locked_id).remove();
         $(premium.icon_container).html(premium.locked);
     }
+}
+
+/**
+ * Show ads flag helper
+ * @returns 
+ */
+export function shouldShowAds() {
+    const canRemoveAds = gateFeature('remove_ads');
+    return !canRemoveAds;
 }
