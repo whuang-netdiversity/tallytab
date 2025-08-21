@@ -2,3 +2,26 @@
 .btn-json-page { cursor: pointer; user-select: none; }
 .btn-json-page.is-active { outline: 2px solid #10b981; font-weight: 700; }
 .btn-json-page.is-disabled { opacity: .45; pointer-events: none; }
+
+/* --- iOS safe areas: pages WITHOUT a navbar --- */
+@supports (padding: env(safe-area-inset-top)) {
+  .ios .view-main .page:not(.with-navbar) > .page-content {
+    padding-top: constant(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* --- iOS safe areas: pages WITH a navbar (Framework7 sometimes misses .with-navbar) --- */
+/* A) Prefer .with-navbar when F7 sets it */
+@supports (padding: env(safe-area-inset-top)) {
+  .ios .view-main .page.with-navbar > .page-content {
+    padding-top: calc(env(safe-area-inset-top) + var(--f7-navbar-height, 44px));
+  }
+}
+
+/* B) Fallback: if .with-navbar isn't present, detect an inline navbar via :has() */
+@supports selector(.page:has(> .navbar)) {
+  .ios .view-main .page:has(> .navbar) > .page-content {
+    padding-top: calc(env(safe-area-inset-top) + var(--f7-navbar-height, 44px));
+  }
+}
